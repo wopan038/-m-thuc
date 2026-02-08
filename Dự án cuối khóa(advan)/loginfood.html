@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Food Login</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  height:100vh;
+  background:url("https://media-cdn-v2.laodong.vn/Storage/NewsPortal/2023/9/29/1247753/Am-Thuc-Viet-Nam.jpeg") center/cover;
+}
+
+/* BOX */
+.container{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:380px;
+  padding:30px;
+  background:rgba(20,20,20,0.95);
+  border-radius:15px;
+  box-shadow:0 0 40px rgba(255,140,0,0.6);
+  color:white;
+}
+
+/* LOGO */
+.logo{
+  text-align:center;
+  font-size:28px;
+  font-weight:bold;
+  margin-bottom:15px;
+}
+
+.logo::before{
+  content:"🍜 ";
+}
+
+/* INPUT */
+input{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  background:#1f1f1f;
+  border:none;
+  color:white;
+  border-radius:8px;
+}
+
+.error{
+  font-size:13px;
+  color:#ffb3b3;
+  min-height:15px;
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:14px;
+  margin-top:10px;
+  background:#ff7a18;
+  border:none;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+button:hover{
+  background:#ff5722;
+}
+
+.switch{
+  text-align:center;
+  margin-top:15px;
+  cursor:pointer;
+  color:#ffc107;
+}
+</style>
+</head>
+
+<body>
+
+<!-- REGISTER -->
+<div class="container" id="registerBox">
+<div class="logo">Food Việt Nam</div>
+<h2>Đăng ký</h2>
+
+<input id="regUser" placeholder="Tên đăng nhập">
+<div class="error" id="userErr"></div>
+
+<input id="regPass" type="password" placeholder="Mật khẩu">
+<div class="error" id="passErr"></div>
+
+<input id="regPass2" type="password" placeholder="Xác nhận mật khẩu">
+<div class="error" id="pass2Err"></div>
+
+<button onclick="register()">Đăng ký</button>
+
+<div class="switch" onclick="showLogin()">Đã có tài khoản? Đăng nhập</div>
+</div>
+
+
+<!-- LOGIN -->
+<div class="container" id="loginBox" style="display:none">
+<div class="logo">Food Việt Nam</div>
+<h2>Đăng nhập</h2>
+
+<input id="loginUser" placeholder="Tên đăng nhập">
+<div class="error" id="loginUserErr"></div>
+
+<input id="loginPass" type="password" placeholder="Mật khẩu">
+<div class="error" id="loginPassErr"></div>
+
+<button onclick="login()">Đăng nhập</button>
+
+<div class="switch" onclick="showRegister()">Chưa có tài khoản? Đăng ký</div>
+</div>
+
+
+<script>
+
+/* ===== CHUYỂN FORM ===== */
+function showLogin(){
+  registerBox.style.display="none";
+  loginBox.style.display="block";
+}
+
+function showRegister(){
+  registerBox.style.display="block";
+  loginBox.style.display="none";
+}
+
+
+/* ===== REGISTER ===== */
+function register(){
+
+userErr.innerText="";
+passErr.innerText="";
+pass2Err.innerText="";
+
+let username = regUser.value.trim();
+let pass = regPass.value.trim();
+let pass2 = regPass2.value.trim();
+
+if(username.length < 3){
+  userErr.innerText="Tên >= 3 ký tự";
+  return;
+}
+
+if(pass.length < 6){
+  passErr.innerText="Mật khẩu >= 6 ký tự";
+  return;
+}
+
+if(pass !== pass2){
+  pass2Err.innerText="Mật khẩu không trùng";
+  return;
+}
+
+/* Lấy danh sách user */
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+/* Check trùng */
+if(users.find(u => u.username === username)){
+  userErr.innerText="Tên đã tồn tại";
+  return;
+}
+
+/* Lưu user */
+users.push({username,password:pass});
+localStorage.setItem("users", JSON.stringify(users));
+
+/* Lưu user đang login */
+localStorage.setItem("user", username);
+
+/* CHUYỂN TRANG */
+location.href="homefood.html";
+}
+
+
+/* ===== LOGIN ===== */
+function login(){
+
+loginPassErr.innerText="";
+
+let username = loginUser.value.trim();
+let pass = loginPass.value.trim();
+
+let users = JSON.parse(localStorage.getItem("users") || "[]");
+
+let found = users.find(
+  u => u.username === username && u.password === pass
+);
+
+if(found){
+  localStorage.setItem("user", username);
+  location.href="homefood.html";
+}
+else{
+  loginPassErr.innerText="Sai tài khoản hoặc mật khẩu";
+}
+}
+
+
+/* ===== AUTO LOGIN ===== */
+window.onload = ()=>{
+  if(localStorage.getItem("user")){
+    location.href="homefood.html";
+  }
+}
+
+</script>
+
+</body>
+</html>
